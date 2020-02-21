@@ -4,8 +4,25 @@ import java.util.*;
 
 public class PyRat {
 
+    private List<Point> cheeses;
+    private Set<Point> setCheeses;
+    private boolean[][] matrice;
+    private  List<Point> pointAccessible;
+    private Map<Point, List<Point>> labyComplet;
+
     /* Méthode appelée une seule fois permettant d'effectuer des traitements "lourds" afin d'augmenter la performace de la méthode turn. */
     public void preprocessing(Map<Point, List<Point>> laby, int labyWidth, int labyHeight, Point position, List<Point> fromages) {
+        Point p = (new Point (0, 6));
+        cheeses = fromages;
+
+        matrice = new boolean[labyWidth][labyHeight];
+
+        for (Point pf: fromages) {
+            matrice[pf.getX()][pf.getY()] = true;
+        }
+
+        labyComplet = laby;
+        pointAccessible = new ArrayList<>();
     }
 
     /* Méthode de test appelant les différentes fonctionnalités à développer.
@@ -14,31 +31,32 @@ public class PyRat {
         @param position - Point contenant la position actuelle du joueur
         @param fromages - List<Point> contenant la liste de tous les Points contenant un fromage. */
     public void turn(Map<Point, List<Point>> laby, int labyWidth, int labyHeight, Point position, List<Point> fromages) {
-        Point pt1 = new Point(2,1);
-        Point pt2 = new Point(3,1);
-        System.out.println((fromageIci(pt1) ? "Il y a un" : "Il n'y a pas de") + " fromage ici, en position " + pt1);
-        System.out.println((fromageIci_EnOrdreConstant(pt2) ? "Il y a un" : "Il n'y a pas de") + " fromage ici, en position " + pt2);
+        Point pt1 = new Point(0,0);
+        Point pt2 = new Point(1,5);
+        //System.out.println((fromageIci(pt1) ? "Il y a un" : "Il n'y a pas de") + " fromage ici, en position " + pt1);
+        //System.out.println((fromageIci_EnOrdreConstant(pt2) ? "Il y a un" : "Il n'y a pas de") + " fromage ici, en position " + pt2);
         System.out.println((passagePossible(pt1, pt2) ? "Il y a un" : "Il n'y a pas de") + " passage de " + pt1 + " vers " + pt2);
-        System.out.println((passagePossible_EnOrdreConstant(pt1, pt2) ? "Il y a un" : "Il n'y a pas de") + " passage de " + pt1 + " vers " + pt2);
-        System.out.println("Liste des points inatteignables depuis la position " + position + " : " + pointsInatteignables(position));
+        //System.out.println((passagePossible_EnOrdreConstant(pt1, pt2) ? "Il y a un" : "Il n'y a pas de") + " passage de " + pt1 + " vers " + pt2);
+        //System.out.println("Liste des points inatteignables depuis la position " + position + " : " + pointsInatteignables(position));
     }
 
     /* Regarde dans la liste des fromages s’il y a un fromage à la position pos.
         @return true s'il y a un fromage à la position pos, false sinon. */
     private boolean fromageIci(Point pos) {
-        return false;
+        return cheeses.contains(pos);
     }
 
     /* Regarde de manière performante (accès en ordre constant) s’il y a un fromage à la position pos.
         @return true s'il y a un fromage à la position pos, false sinon. */
     private boolean fromageIci_EnOrdreConstant(Point pos) {
-        return false;
+        return matrice[pos.getX()][pos.getY()];
     }
 
     /* Indique si le joueur peut passer de la position (du Point) « de » au point « a ».
         @return true s'il y a un passage depuis  « de » vers « a ». */
     private boolean passagePossible(Point de, Point a) {
-        return false;
+        List<Point> lpt = labyComplet.get(de);
+        return lpt.contains(a);
     }
 
     /* Indique si le joueur peut passer de la position (du Point) « de » au point « a »,
@@ -51,6 +69,13 @@ public class PyRat {
     /* Retourne la liste des points qui ne peuvent pas être atteints depuis la position « pos ».
         @return la liste des points qui ne peuvent pas être atteints depuis la position « pos ». */
     private List<Point> pointsInatteignables(Point pos) {
+        List<Point> lpt = labyComplet.get(pos);
+        for (Point pt : lpt){
+            if (!pointAccessible.contains(pt)) {
+                pointAccessible.add(pt);
+                pointsInatteignables(pt);
+            }
+        }
         return null;
     }
 }
